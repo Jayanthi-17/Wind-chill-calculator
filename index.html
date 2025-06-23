@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wind Chill Calculator | The Old Farmer's Almanac</title>
+</head>
+<body>
+    <div id="calculator-container"></div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Create the main container
+            const calculator = document.createElement('div');
+            calculator.className = 'wind-chill-calculator';
+            
+            // Create and add the style element
+            const style = document.createElement('style');
+            style.textContent = `
+                .wind-chill-calculator {
+                    font-family: 'Georgia', serif;
+                    max-width: 400px;
+                    margin: 20px auto;
+                    padding: 25px;
+                    border: 1px solid #e0d6c2;
+                    border-radius: 5px;
+                    background-color: #f9f7f0;
+                    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+                }
+                .wind-chill-calculator h2 {
+                    color: #ad2a24;
+                    font-family: 'Georgia', serif;
+                    font-weight: normal;
+                    font-size: 24px;
+                    margin-top: 0;
+                    margin-bottom: 20px;
+                    border-bottom: 1px solid #e0d6c2;
+                    padding-bottom: 10px;
+                }
+                .input-group {
+                    margin-bottom: 20px;
+                    position: relative;
+                }
+                label {
+                    display: block;
+                    margin-bottom: 6px;
+                    color: #333;
+                    font-size: 16px;
+                }
+                input {
+                    width: 100%;
+                    padding: 10px;
+                    border: 1px solid #d4c9a8;
+                    border-radius: 3px;
+                    box-sizing: border-box;
+                    font-family: 'Georgia', serif;
+                    font-size: 16px;
+                    background-color: #fffdf8;
+                }
+                input.error {
+                    border-color: #ad2a24;
+                }
+                input:focus {
+                    outline: none;
+                    border-color: #ad2a24;
+                    box-shadow: 0 0 3px rgba(173,42,36,0.3);
+                }
+                button {
+                    background-color: #ad2a24;
+                    color: white;
+                    padding: 12px 20px;
+                    border: none;
+                    border-radius: 3px;
+                    cursor: pointer;
+                    font-size: 16px;
+                    font-family: 'Georgia', serif;
+                    width: 100%;
+                    transition: background-color 0.3s;
+                }
+                button:hover {
+                    background-color: #8c221d;
+                }
+                .result {
+                    margin-top: 25px;
+                    padding: 15px;
+                    background-color: #f0e8d8;
+                    border-radius: 3px;
+                    font-size: 18px;
+                    text-align: center;
+                    border-left: 4px solid #D3D3D3;
+                    display: none;
+                }
+                .result strong {
+                    color: #ad2a24;
+                }
+                .formula-note {
+                    font-size: 13px;
+                    color: #666;
+                    margin-top: 25px;
+                    line-height: 1.5;
+                    font-style: italic;
+                }
+                .formula-note sup {
+                    font-size: 0.8em;
+                }
+                .error-message {
+                    color: #ad2a24;
+                    font-size: 13px;
+                    margin-top: 5px;
+                    display: none;
+                }
+                .warning-message {
+                    color: #ad2a24;
+                    background-color: #f0e8d8;
+                    padding: 10px;
+                    border-radius: 3px;
+                    margin-top: 15px;
+                    font-size: 14px;
+                    display: none;
+                }
+            `;
+            document.head.appendChild(style);
+            
+            // Add HTML content
+            calculator.innerHTML = `
+                <h2>Wind Chill Calculator</h2>
+                <div class="input-group">
+                    <label for="temperature">Air Temperature (°F):</label>
+                    <input type="number" id="temperature" placeholder="e.g., 32">
+                    <div class="error-message" id="temp-error"></div>
+                </div>
+                <div class="input-group">
+                    <label for="wind-speed">Wind Speed (mph):</label>
+                    <input type="number" id="wind-speed" placeholder="e.g., 10">
+                    <div class="error-message" id="wind-error"></div>
+                </div>
+                <button id="calculate-btn">Calculate Wind Chill</button>
+                
+                <div class="warning-message" id="range-warning"></div>
+                
+                <div id="result" class="result">
+                    <strong>Wind Chill:</strong> <span id="wind-chill-value"></span> °F
+                </div>
+                
+                <div class="formula-note">
+                    <p>Formula used: Wind Chill = 35.74 + 0.6215T - 35.75(V<sup>0.16</sup>) + 0.4275T(V<sup>0.16</sup>)<br>
+                    Where T = Air Temperature (°F) and V = Wind Speed (mph)<br><br>
+                    <em>Note: Wind chill is calculated for temperatures at or below 50°F and wind speeds above 3 mph.</em></p>
+                </div>
+            `;
+            
+            // Add calculator to the container
+            document.getElementById('calculator-container').appendChild(calculator);
+            
+            // Get elements
+            const calculateBtn = document.getElementById('calculate-btn');
+            const tempInput = document.getElementById('temperature');
+            const windInput = document.getElementById('wind-speed');
+            const tempError = document.getElementById('temp-error');
+            const windError = document.getElementById('wind-error');
+            const rangeWarning = document.getElementById('range-warning');
+            const resultDiv = document.getElementById('result');
+            
+            // Add event listeners
+            calculateBtn.addEventListener('click', calculateWindChill);
+            
+            tempInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') calculateWindChill();
+            });
+            
+            windInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') calculateWindChill();
+            });
+            
+            // Clear errors when typing
+            tempInput.addEventListener('input', function() {
+                tempError.style.display = 'none';
+                tempInput.classList.remove('error');
+            });
+            
+            windInput.addEventListener('input', function() {
+                windError.style.display = 'none';
+                windInput.classList.remove('error');
+            });
+            
+            // Initially hide the result and warning
+            resultDiv.style.display = 'none';
+            rangeWarning.style.display = 'none';
+            
+            // Wind chill calculation function
+            function calculateWindChill() {
+                // Reset previous errors/warnings
+                tempError.style.display = 'none';
+                windError.style.display = 'none';
+                rangeWarning.style.display = 'none';
+                tempInput.classList.remove('error');
+                windInput.classList.remove('error');
+                
+                // Get input values
+                const temp = parseFloat(tempInput.value);
+                const windSpeed = parseFloat(windInput.value);
+                let isValid = true;
+                
+                // Validate temperature
+                if (isNaN(temp)) {
+                    tempError.textContent = 'Please enter a valid temperature';
+                    tempError.style.display = 'block';
+                    tempInput.classList.add('error');
+                    isValid = false;
+                }
+                
+                // Validate wind speed
+                if (isNaN(windSpeed)) {
+                    windError.textContent = 'Please enter a valid wind speed';
+                    windError.style.display = 'block';
+                    windInput.classList.add('error');
+                    isValid = false;
+                }
+                
+                if (!isValid) return;
+                
+                // Check if inputs are within valid range for formula
+                if (temp > 50 || windSpeed <= 3) {
+                    rangeWarning.textContent = 'Note: Wind chill is only calculated for temperatures at or below 50°F and wind speeds above 3 mph.';
+                    rangeWarning.style.display = 'block';
+                    resultDiv.style.display = 'none';
+                    return;
+                }
+                
+                // Calculate wind chill using the NWS formula
+                const windChill = 35.74 + (0.6215 * temp) - (35.75 * Math.pow(windSpeed, 0.16)) + (0.4275 * temp * Math.pow(windSpeed, 0.16));
+                
+                // Display result rounded to 1 decimal place
+                document.getElementById('wind-chill-value').textContent = windChill.toFixed(1);
+                resultDiv.style.display = 'block';
+            }
+        });
+    </script>
+</body>
+</html>
