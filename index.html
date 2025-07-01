@@ -6,122 +6,125 @@
     <title>Wind Chill Calculator | The Old Farmer's Almanac</title>
 </head>
 <body>
-    <div id="calculator-container"></div>
+    <!-- Safe container for the calculator -->
+    <div id="windChillContainer"></div>
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Create the main container
+            const container = document.getElementById('windChillContainer');
+            
+            // Create the calculator element
             const calculator = document.createElement('div');
             calculator.className = 'wind-chill-calculator';
             
-            // Create and add the style element
+            // Add scoped styles
             const style = document.createElement('style');
             style.textContent = `
-    .wind-chill-calculator {
-        font-family: 'Georgia', serif;
-        max-width: 400px;
-        margin: 20px auto;
-        padding: 25px;
-        border: 1px solid #e0d6c2;
-        border-radius: 5px;
-        background-color: #f9f7f0;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-    }
-    .wind-chill-calculator h2 {
-        color: #ad2a24;
-        font-family: 'Georgia', serif;
-        font-weight: normal;
-        font-size: 24px;
-        margin-top: 0;
-        margin-bottom: 20px;
-        border-bottom: 1px solid #e0d6c2;
-        padding-bottom: 10px;
-    }
-    .wind-chill-calculator .input-group {
-        margin-bottom: 20px;
-        position: relative;
-    }
-    .wind-chill-calculator label {
-        display: block;
-        margin-bottom: 6px;
-        color: #333;
-        font-size: 16px;
-    }
-    .wind-chill-calculator input {
-        width: 100%;
-        padding: 10px;
-        border: 1px solid #d4c9a8;
-        border-radius: 3px;
-        box-sizing: border-box;
-        font-family: 'Georgia', serif;
-        font-size: 16px;
-        background-color: #fffdf8;
-    }
-    .wind-chill-calculator input.error {
-        border-color: #ad2a24;
-    }
-    .wind-chill-calculator input:focus {
-        outline: none;
-        border-color: #ad2a24;
-        box-shadow: 0 0 3px rgba(173,42,36,0.3);
-    }
-    .wind-chill-calculator button {
-        background-color: #ad2a24;
-        color: white;
-        padding: 12px 20px;
-        border: none;
-        border-radius: 3px;
-        cursor: pointer;
-        font-size: 16px;
-        font-family: 'Georgia', serif;
-        width: 100%;
-        transition: background-color 0.3s;
-    }
-    .wind-chill-calculator button:hover {
-        background-color: #8c221d;
-    }
-    .wind-chill-calculator .result {
-        margin-top: 25px;
-        padding: 15px;
-        background-color: #f0e8d8;
-        border-radius: 3px;
-        font-size: 18px;
-        text-align: center;
-        border-left: 4px solid #D3D3D3;
-        display: none;
-    }
-    .wind-chill-calculator .result strong {
-        color: #ad2a24;
-    }
-    .wind-chill-calculator .formula-note {
-        font-size: 13px;
-        color: #666;
-        margin-top: 25px;
-        line-height: 1.5;
-        font-style: italic;
-    }
-    .wind-chill-calculator .formula-note sup {
-        font-size: 0.8em;
-    }
-    .wind-chill-calculator .error-message {
-        color: #ad2a24;
-        font-size: 13px;
-        margin-top: 5px;
-        display: none;
-    }
-    .wind-chill-calculator .warning-message {
-        color: #ad2a24;
-        background-color: #f0e8d8;
-        padding: 10px;
-        border-radius: 3px;
-        margin-top: 15px;
-        font-size: 14px;
-        display: none;
-    }
-`;
+                .wind-chill-calculator {
+                    font-family: 'Georgia', serif;
+                    max-width: 400px;
+                    margin: 20px auto;
+                    padding: 25px;
+                    border: 1px solid #e0d6c2;
+                    border-radius: 5px;
+                    background-color: #f9f7f0;
+                    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+                }
+                .wind-chill-calculator h2 {
+                    color: #ad2a24;
+                    font-family: 'Georgia', serif;
+                    font-weight: normal;
+                    font-size: 24px;
+                    margin-top: 0;
+                    margin-bottom: 20px;
+                    border-bottom: 1px solid #e0d6c2;
+                    padding-bottom: 10px;
+                }
+                .wind-chill-calculator .input-group {
+                    margin-bottom: 20px;
+                    position: relative;
+                }
+                .wind-chill-calculator label {
+                    display: block;
+                    margin-bottom: 6px;
+                    color: #333;
+                    font-size: 16px;
+                }
+                .wind-chill-calculator input {
+                    width: 100%;
+                    padding: 10px;
+                    border: 1px solid #d4c9a8;
+                    border-radius: 3px;
+                    box-sizing: border-box;
+                    font-family: 'Georgia', serif;
+                    font-size: 16px;
+                    background-color: #fffdf8;
+                }
+                .wind-chill-calculator input.error {
+                    border-color: #ad2a24;
+                }
+                .wind-chill-calculator input:focus {
+                    outline: none;
+                    border-color: #ad2a24;
+                    box-shadow: 0 0 3px rgba(173,42,36,0.3);
+                }
+                .wind-chill-calculator button {
+                    background-color: #ad2a24;
+                    color: white;
+                    padding: 12px 20px;
+                    border: none;
+                    border-radius: 3px;
+                    cursor: pointer;
+                    font-size: 16px;
+                    font-family: 'Georgia', serif;
+                    width: 100%;
+                    transition: background-color 0.3s;
+                }
+                .wind-chill-calculator button:hover {
+                    background-color: #8c221d;
+                }
+                .wind-chill-calculator .result {
+                    margin-top: 25px;
+                    padding: 15px;
+                    background-color: #f0e8d8;
+                    border-radius: 3px;
+                    font-size: 18px;
+                    text-align: center;
+                    border-left: 4px solid #D3D3D3;
+                    display: none;
+                }
+                .wind-chill-calculator .result strong {
+                    color: #ad2a24;
+                }
+                .wind-chill-calculator .formula-note {
+                    font-size: 13px;
+                    color: #666;
+                    margin-top: 25px;
+                    line-height: 1.5;
+                    font-style: italic;
+                }
+                .wind-chill-calculator .formula-note sup {
+                    font-size: 0.8em;
+                }
+                .wind-chill-calculator .error-message {
+                    color: #ad2a24;
+                    font-size: 13px;
+                    margin-top: 5px;
+                    display: none;
+                }
+                .wind-chill-calculator .warning-message {
+                    color: #ad2a24;
+                    background-color: #f0e8d8;
+                    padding: 10px;
+                    border-radius: 3px;
+                    margin-top: 15px;
+                    font-size: 14px;
+                    display: none;
+                }
+            `;
             document.head.appendChild(style);
             
-            // Add HTML content
+            // Calculator HTML
             calculator.innerHTML = `
                 <h2>Wind Chill Calculator</h2>
                 <div class="input-group">
@@ -149,8 +152,7 @@
                 </div>
             `;
             
-            // Add calculator to the container
-            document.getElementById('calculator-container').appendChild(calculator);
+            container.appendChild(calculator);
             
             // Get elements
             const calculateBtn = document.getElementById('calculate-btn');
@@ -161,7 +163,11 @@
             const rangeWarning = document.getElementById('range-warning');
             const resultDiv = document.getElementById('result');
             
-            // Add event listeners
+            // Initialize hidden elements
+            resultDiv.style.display = 'none';
+            rangeWarning.style.display = 'none';
+            
+            // Event listeners
             calculateBtn.addEventListener('click', calculateWindChill);
             
             tempInput.addEventListener('keypress', function(e) {
@@ -183,11 +189,7 @@
                 windInput.classList.remove('error');
             });
             
-            // Initially hide the result and warning
-            resultDiv.style.display = 'none';
-            rangeWarning.style.display = 'none';
-            
-            // Wind chill calculation function
+            // Wind chill calculation function (NOW COMPLETE)
             function calculateWindChill() {
                 // Reset previous errors/warnings
                 tempError.style.display = 'none';
@@ -233,6 +235,14 @@
                 // Display result rounded to 1 decimal place
                 document.getElementById('wind-chill-value').textContent = windChill.toFixed(1);
                 resultDiv.style.display = 'block';
+                
+                // Show frostbite warning for extreme cold
+                if (windChill < -20) {
+                    rangeWarning.textContent = windChill < -40 ? 
+                        'DANGER: Frostbite can occur in less than 5 minutes!' : 
+                        'WARNING: Frostbite can occur in 30 minutes or less!';
+                    rangeWarning.style.display = 'block';
+                }
             }
         });
     </script>
